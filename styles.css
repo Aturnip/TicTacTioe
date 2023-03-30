@@ -1,18 +1,86 @@
 body {
-    
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Oswald', sans-serif;
+    background-color: gray;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-.boardContainer {
-    background-color: grey;
-    height: 500px;
-    width: 500px;
+
+.game_container {
+    background-color: white;
+    height: 80%;
+    width: 70%;
+    border: 1px solid black;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.board_container {
+    font-size: 32px;
+    align-self: center;
+    aspect-ratio: 1/1;
+    width: 40%;
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
 }
 
 .tile {
-    font-size:xx-large;
     border: 1px solid black;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.navbar {
+    font-size: 40px;
+    width: 30%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+select {
+    width: 50%;
+    font-size: 16px;
+}
+
+.navbar_mode_select {
+    display: flex;
+    gap: 10px;
+    justify-content: space-evenly;
+}
+
+.navbar_mini_tile {
+    font-size: 32px;
+    aspect-ratio: 1/1;
+    width: 20%;
+    align-self: center;
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+button {
+    font-size: 20px;
+}
+
+.clicked {
+    background-color: orange;
+}
+
+.button_container {
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.reset_button {
+    aspect-ratio: 1/1;
+    width: 100%;
 }

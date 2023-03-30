@@ -1,69 +1,130 @@
 // players object
 const player = (name, sign) => {
-    this.board = [];
-    return {name, sign, board};
+  this.board = [];
+  return { name, sign, board };
 };
 
-const player1 = player("Admin", "X");
-const player2 = player("Computer", "O");
+const player1 = player("Player 1", "X");
+const player2 = player("Player 2", "O");
+const computerPlayer = player("Computer", "O");
 
-// creating a gameboard module - I need just one of it
+// selecting players
+const playersSelect = (() => {
+  const pVP = document.querySelector(".navbar_pvp_button");
+  const pVC = document.querySelector(".navbar_pvc_button");
+
+  pVP.classList.add("clicked");
+  let currentPlayers = [player1, player2];
+  
+  pVP.addEventListener("click", () => {
+    if (currentPlayers[1] === computerPlayer) currentPlayers = [player1, player2];
+    pVP.classList.add("clicked");
+    pVC.classList.remove("clicked");
+    return;
+  });
+  
+  pVC.addEventListener("click", () => {
+    if (currentPlayers[1] === player2) currentPlayers = [player1, computerPlayer];
+    pVC.classList.add("clicked");
+    pVP.classList.remove("clicked");
+    return;
+  });
+
+  return { currentPlayers};
+})();
+
+// module for difficulty settings
+const difficultySetting = (() => {
+  const difficultySettingButton = document.querySelector("select");
+
+  let difficulty = difficultySettingButton.value;
+
+  difficultySettingButton.addEventListener("change", (e) => {
+    difficulty = difficultySettingButton.value;
+  })
+
+  return { difficulty };
+})();
+
+// module for showing who turn it is and what symbol he gets
+const whosTurnItIs = (() => {
+  const whosTurnText = document.querySelector(".navbar_whos_turn");
+  const whosTurnTile = document.querySelector(".navbar_mini_tile");
+
+  const text = (str) => {
+    whosTurnText.textContent = `${str}`;
+  }
+
+  const tile = (sign) => {
+    whosTurnTile.textContent = `${sign}`;
+  }
+
+  return {text, tile};
+})();
+
+// creating a gameboard module
 const gameBoard = (() => {
-    let board = ["", "", "", "", "", "", "", "", ""];
+  const tiles = [];
+  for (let i=0; i<9; i++) {
+    tiles[i] = document.querySelector(`#tile${i}`);
+  }
 
-    let currentPlayer = player1;
+  const changeTileText = (tileNr, currentPlayerSign) => {
+    tiles[tileNr+1].textContent = `${currentPlayerSign}`;
+  }
 
-    const winningPattern = [
-        [0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,3,6]
-    ];
-
-    const switchTurns = () => {
-        currentPlayer === player1 ? currentPlayer = player2 : currentPlayer = player1;
-        document.querySelector("#turnDisplay").textContent = `${currentPlayer.name} turn`;
+  const changeWholeBoardText = (array) => {
+    for (let i=0; i<9; i++) {
+      tiles[i].textContent = `${array[i]}`;
     }
+  }
 
-    const display = () => {
-        for (i=0; i<board.length; i++) {
-            document.querySelector(`#tile${i}`).textContent = board[i];
-        }
+  return {tiles, changeTileText, changeWholeBoardText};
+})();
+
+const game = (() => {
+  let boardState = ["", "", "", "", "", "", "", "", ""];
+  let currentPlayers = playersSelect.currentPlayers;
+  let currentPlayer = currentPlayers[0];
+  whosTurnItIs.text(`${currentPlayer.name} turn`);
+  whosTurnItIs.tile(`${currentPlayer.sign}`);
+  const winningPattern = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 3, 6],
+  ];
+
+  const resetBoard = document.querySelector(".reset_button").addEventListener("click", () => {
+    gameBoard.changeWholeBoardText(["", "", "", "", "", "", "", "", ""]);
+    currentPlayer = currentPlayers[0];
+    whosTurnItIs.text(`${currentPlayer.name} turn`);
+    whosTurnItIs.tile(`${currentPlayer.sign}`);
+  })
+  
+  function switchTurns() {
+    if (currentPlayer.name === currentPlayers[0].name) {
+      currentPlayer = currentPlayers[1];
+    } else {
+      currentPlayer = currentPlayers[0];
     }
+    whosTurnItIs.text(`${currentPlayer.name} turn`);
+    whosTurnItIs.tile(`${currentPlayer.sign}`);
+  }
 
-    const playerScoreUpd = (id) => {
-        currentPlayer.board.push(id);
-        for (const pattern of winningPattern) {
-            if (currentPlayer.board.includes(pattern[0]) && currentPlayer.board.includes(pattern[1]) && currentPlayer.board.includes(pattern[2])) {
-                alert(`${currentPlayer.name} WINS!!!`);
-            }
-        }
+  gameBoard.tiles.forEach((tile, player) => tile.addEventListener("click", () => {
+    if (tile.textContent === "") {
+      tile.textContent = `${currentPlayer.sign}`;
+      console.log(tile.id);
+      switchTurns();
     }
+  }))
 
-    // update boardu po klinieciu
-    const boardUpdate = (id, sign) => {
-        if (board[id] === "") {
-            board[id] = sign;
-            display();
-            playerScoreUpd(id);
-            switchTurns();
-        }
-    }
 
-    // event listener
-    document.querySelectorAll(".tile").forEach((tile) => {
-        tile.addEventListener("click", (e) => {
-            boardUpdate(Number(e.target.id.slice(-1)), currentPlayer.sign); 
-        })
-    });
 
-    document.querySelector("button").addEventListener("click", () => {
-        board = ["", "", "", "", "", "", "", "", ""];
-        player1.board = [];
-        player2.board = [];
-        currentPlayer = player2;
-        switchTurns();
-        display();
-    });
-
-    return {};
-
-}) ();
-
+  return {};
+})();
