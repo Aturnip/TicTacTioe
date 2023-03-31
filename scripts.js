@@ -30,7 +30,7 @@ const playersSelect = (() => {
     return;
   });
 
-  return { currentPlayers};
+  return {currentPlayers, pVP, pVC};
 })();
 
 // module for difficulty settings
@@ -82,13 +82,26 @@ const gameBoard = (() => {
   return {tiles, changeTileText, changeWholeBoardText};
 })();
 
+const winnerCelebration = (() => {
+  const gameContainerElement = document.querySelector(".board_container");
+  function transition() {
+    gameContainerElement.classList.add("winnerTransition");
+  }
+
+  function transitionOver() {
+    gameContainerElement.classList.remove("winnerTransition");
+  }
+
+  return { transition, transitionOver }
+})()
+
 const game = (() => {
   let boardState = ["", "", "", "", "", "", "", "", ""];
   let currentPlayers = playersSelect.currentPlayers;
   let currentPlayer = currentPlayers[0];
   whosTurnItIs.text(`${currentPlayer.name} turn`);
   whosTurnItIs.tile(`${currentPlayer.sign}`);
-  const winningPattern = [
+  const winningPatterns = [
     [0, 1, 2],
     [3, 4, 5],
     [6, 7, 8],
@@ -99,11 +112,17 @@ const game = (() => {
     [2, 3, 6],
   ];
 
-  const resetBoard = document.querySelector(".reset_button").addEventListener("click", () => {
+  function resetBoard() {
     gameBoard.changeWholeBoardText(["", "", "", "", "", "", "", "", ""]);
+    boardState = ["", "", "", "", "", "", "", "", ""];
     currentPlayer = currentPlayers[0];
     whosTurnItIs.text(`${currentPlayer.name} turn`);
     whosTurnItIs.tile(`${currentPlayer.sign}`);
+    winnerCelebration.transitionOver();
+  }
+
+  const resetBoardButton = document.querySelector(".reset_button").addEventListener("click", () => {
+    resetBoard();
   })
   
   function switchTurns() {
@@ -116,14 +135,24 @@ const game = (() => {
     whosTurnItIs.tile(`${currentPlayer.sign}`);
   }
 
-  gameBoard.tiles.forEach((tile, player) => tile.addEventListener("click", () => {
+  function checkForWinner() {
+    for (let i=0; i<winningPatterns.length; i++){
+      if (boardState[winningPatterns[i][0]] === currentPlayer.sign 
+        && boardState[winningPatterns[i][1]] === currentPlayer.sign
+        && boardState[winningPatterns[i][2]] === currentPlayer.sign) {
+        return 1;
+      }
+    }
+    return 0;
+  }
+
+  gameBoard.tiles.forEach((tile) => tile.addEventListener("click", () => {
     if (tile.textContent === "") {
       tile.textContent = `${currentPlayer.sign}`;
-      console.log(tile.id);
-      switchTurns();
+      boardState[tile.id.slice(-1)] = `${currentPlayer.sign}`;
+      checkForWinner() ? winnerCelebration.transition() : switchTurns();
     }
   }))
-
 
 
   return {};

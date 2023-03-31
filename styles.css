@@ -18,6 +18,8 @@ body {
 }
 
 .board_container {
+    background-color: white;
+    transition: background-color 1s ease 0s;
     font-size: 32px;
     align-self: center;
     aspect-ratio: 1/1;
@@ -25,6 +27,10 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr;
+}
+
+.winnerTransition {
+    background-color: red;
 }
 
 .tile {
